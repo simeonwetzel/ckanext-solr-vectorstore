@@ -1,0 +1,51 @@
+{% ckan_extends %}
+
+{% block search_sortby %}
+{{ super() }}
+<div class="form-select form-group control-order-by">
+    <label for="field-algorithm">Search Algorithm</label>
+    <select id="field-algorithm" name="algorithm">
+        <option value="sbert">SBERT/DotProd</option>
+        <option value="bm25" selected="selected">BM25</option>
+    </select>
+</div>
+<!-- <div class="form-select form-group control-order-by">
+    <input type="radio" id="sbert" name="algorithm" value="sbert" onclick="">
+    <label for="child">SBERT/DotProd</label>
+    <input type="radio" id="bm25" name="algorithm" value="bm25">
+    <label for="adult">BM25</label>
+</div> -->
+
+<script>
+    const selectElement = document.getElementById('field-algorithm');
+    const sort = document.getElementById('field-order-by');
+    const q =  document.querySelector('input[class="search"]');
+
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedOption = urlParams.get('algorithm');
+    if (selectedOption) {
+        selectElement.value = selectedOption;
+    }
+
+    selectElement.addEventListener('change', (event) => {
+        var urlObject = new URL(window.location);
+        urlObject.searchParams.delete('algorithm');
+        urlObject.searchParams.append('algorithm', selectElement.value)
+        urlObject.searchParams.delete('sort');
+        urlObject.searchParams.append('sort', sort.value)
+        urlObject.searchParams.delete('q');
+        urlObject.searchParams.append('q', q.value)
+
+        window.location.href = urlObject;
+    });
+
+</script>
+{% endblock %}
+
+{% block search_facets %}
+{% if 'algorithm' in facets.fields %}
+{% do facets.fields.pop('algorithm') %}
+{% endif %}
+{{ super() }}
+{% endblock %}
